@@ -1,0 +1,33 @@
+import os
+import docx
+import time
+from translate import Translator
+
+def translate_docx_file(docx_file):
+    doc = docx.Document(docx_file)
+    translator = Translator(to_lang='ar')
+
+    # Translate each paragraph in the document
+    for paragraph in doc.paragraphs:
+        original_text = paragraph.text
+        translated_text = translator.translate(original_text)
+        paragraph.text = translated_text
+        time.sleep(1)  # Add a 1-second delay between each translation request
+
+    # Save the translated document
+    translated_file = f"{os.path.splitext(docx_file)[0]}_translated.docx"
+    doc.save(translated_file)
+    print(f"Translated file created: {translated_file}")
+
+def batch_translate_docx_files(folder_path):
+    docx_files = [f for f in os.listdir(folder_path) if f.endswith(".docx")]
+
+    for docx_file in docx_files:
+        try:
+            translate_docx_file(os.path.join(folder_path, docx_file))
+        except Exception as e:
+            print(f"Error translating file: {os.path.join(folder_path, docx_file)}")
+            print(e)
+
+folder_path = input("Enter the folder path containing .docx files: ")
+batch_translate_docx_files(folder_path)
